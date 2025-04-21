@@ -1,0 +1,7 @@
+{
+  "editor.defaultFormatter": "biomejs.biome",
+  "files.associations": {
+    "pages.json": "jsonc"
+  },
+  "cSpell.words": ["uniapp", "easycom"]
+}
