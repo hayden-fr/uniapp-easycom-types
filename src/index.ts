@@ -1,13 +1,12 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
-import type { Plugin } from 'vite'
+import { readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join, relative } from 'node:path'
 import { globSync } from 'fast-glob'
-import { writeFileSync } from 'node:fs'
+import type { Plugin } from 'vite'
 
-const requireJson = <T = any>(
+const requireJson = (
   filename: string,
-  defaultValue: T,
-): T | undefined => {
+  defaultValue: AnyObject = {},
+): AnyObject => {
   try {
     const content = readFileSync(filename, 'utf-8')
     const contentWithoutComments = content.replace(
@@ -37,6 +36,11 @@ const pascalCase = (str: string) => {
   return pascalCase
 }
 
+const genRelativePath = (from: string, to: string) => {
+  const relativePath = relative(from, to)
+  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`
+}
+
 export interface EasycomOptions {
   dts?: string
 }
@@ -52,10 +56,13 @@ const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
 
   const generateDts = () => {
     const filename = join(resolvedOptions.root, resolvedOptions.dts)
+    const dtsDir = dirname(resolvedOptions.dts)
+
     const components: string[] = []
     for (const [name, url] of easycomMap.entries()) {
+      const relativePath = genRelativePath(dtsDir, url)
       components.push(
-        `    ${pascalCase(name)}: (typeof import('${url}'))['default']`,
+        `    ${pascalCase(name)}: (typeof import('${relativePath}'))['default']`,
       )
     }
 
@@ -83,7 +90,7 @@ const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
       resolvedOptions.root = root
 
       const pagesJsonPath = join(root, 'src/pages.json')
-      const pagesJson = requireJson<any>(pagesJsonPath, {})
+      const pagesJson = requireJson(pagesJsonPath)
 
       const customEasycom = pagesJson.easycom?.custom ?? {}
 
@@ -103,9 +110,12 @@ const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
         }
       }
 
-      Object.assign(customEasycom, {
-        '^(.*)$': 'components/$1/$1.vue',
-      })
+      const autoScan = pagesJson.easycom?.autoscan ?? true
+      if (autoScan) {
+        Object.assign(customEasycom, {
+          '^(.*)$': 'components/$1/$1.vue',
+        })
+      }
 
       resolvedOptions.easycom = customEasycom
     },
@@ -133,8 +143,8 @@ const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
             componentName = componentName.replace(/\$$/g, '')
 
             const componentUrl = pattern.replace(/\$\d+/g, (m) => {
-              const [, index] = /\$(\d+)/.exec(m) ?? [, '1']
-              return matchNames[parseInt(index) - 1]
+              const [, index] = /\$(\d+)/.exec(m) ?? ['', '1']
+              return matchNames[Number.parseInt(index) - 1]
             })
 
             if (componentUrl === importUrl) {
