@@ -45,11 +45,16 @@ export interface EasycomOptions {
   dts?: string
 }
 
+interface EasycomObject {
+  name: string
+  pattern: string
+}
+
 const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
   const resolvedOptions = {
     root: process.cwd(),
     dts: opts.dts || 'src/easycom.d.ts',
-    easycom: {} as Record<string, string>,
+    easycom: [] as EasycomObject[],
   }
 
   const easycomMap = new Map<string, string>()
@@ -93,42 +98,53 @@ const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
       const pagesJson = requireJson(pagesJsonPath)
 
       const customEasycom = pagesJson.easycom?.custom ?? {}
+      const easycom: EasycomObject[] = []
 
       for (const key in customEasycom) {
         if (Object.prototype.hasOwnProperty.call(customEasycom, key)) {
           const pattern = customEasycom[key]
 
           if (pattern.startsWith('@/')) {
-            customEasycom[key] = pattern.replace('@/', 'src/')
+            easycom.push({ name: key, pattern: pattern.replace('@/', 'src/') })
           } else if (pattern.startsWith('./')) {
-            customEasycom[key] = pattern.replace('./', 'src/')
+            easycom.push({ name: key, pattern: pattern.replace('./', 'src/') })
           } else if (pattern.startsWith('../')) {
-            customEasycom[key] = pattern.replace('../', '')
+            easycom.push({ name: key, pattern: pattern.replace('../', '') })
           } else {
-            customEasycom[key] = `node_modules/${pattern}`
+            easycom.push({ name: key, pattern: `node_modules/${pattern}` })
           }
         }
       }
 
       const autoScan = pagesJson.easycom?.autoscan ?? true
       if (autoScan) {
-        Object.assign(customEasycom, {
-          '^(.*)$': 'components/$1/$1.vue',
+        easycom.push({
+          name: '^(.*)$',
+          pattern: 'src/uni_modules/$0/components/$1/$1.vue',
+        })
+        easycom.push({
+          name: '^(.*)$',
+          pattern: 'src/components/$1/$1.vue',
         })
       }
 
-      resolvedOptions.easycom = customEasycom
+      resolvedOptions.easycom = easycom
     },
     async buildStart() {
       const { root, easycom } = resolvedOptions
 
-      for (const [name, pattern] of Object.entries(easycom)) {
+      for (const { name, pattern } of easycom) {
+        // 将占位符转化为glob通配符，用于快速查找文件
         const globPattern = pattern.replace(/\$\d+/g, '*')
         const files = globSync(globPattern, {
           cwd: root,
         })
 
-        const regexp = new RegExp(pattern.replace(/\$\d+/g, '(.*)'))
+        // 将占位符转化为正则表达式，用于提取匹配项
+        // $0作为通用占位符，用于匹配任意字符
+        const regexp = new RegExp(
+          pattern.replace('$0', '.*').replace(/\$\d+/g, '(.*)'),
+        )
         for (const filename of files) {
           const matches = regexp.exec(filename)
           if (matches) {
@@ -142,13 +158,17 @@ const pluginEasycom = (opts: EasycomOptions = {}): Plugin => {
             componentName = componentName.replace(/^\^/g, '')
             componentName = componentName.replace(/\$$/g, '')
 
+            // 使用匹配模式生成组件路径，用于校验组件是否满足匹配模式
             const componentUrl = pattern.replace(/\$\d+/g, (m) => {
-              const [, index] = /\$(\d+)/.exec(m) ?? ['', '1']
-              return matchNames[Number.parseInt(index) - 1]
+              // 提取匹配位置
+              const [, indexStr] = /\$(\d+)/.exec(m) ?? ['', '1']
+              const index = Number.parseInt(indexStr) - 1
+              return index === -1 ? '.*' : matchNames[index]
             })
 
-            if (componentUrl === importUrl) {
-              easycomMap.set(componentName, componentUrl)
+            const componentRegexp = new RegExp(componentUrl)
+            if (componentRegexp.test(importUrl)) {
+              easycomMap.set(componentName, importUrl)
             }
           }
         }
