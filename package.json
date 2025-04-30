@@ -9,6 +9,7 @@
   ],
   "author": "Hayden <hayden.mike.zhang@gmail.com>",
   "packageManager": "pnpm@10.8.0",
+  "repository": "hayden-fr/uniapp-easycom-types",
   "exports": {
     ".": {
       "import": {
@@ -21,11 +22,18 @@
       }
     }
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "tsup src/*.ts --watch src",
+    "dev": "vitest dev",
     "build": "tsup src/*.ts --format cjs,esm --dts --splitting --clean",
     "check": "biome check",
-    "format": "biome format"
+    "format": "biome format",
+    "test": "vitest --coverage"
   },
   "dependencies": {
     "fast-glob": "^3.3.3",
@@ -34,7 +42,9 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.14.0",
+    "@vitest/coverage-v8": "^3.1.2",
     "tsup": "^8.4.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.2"
   }
 }
