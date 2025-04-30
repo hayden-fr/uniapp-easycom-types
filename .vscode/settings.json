@@ -1,7 +1,9 @@
 {
-  "editor.defaultFormatter": "biomejs.biome",
   "files.associations": {
     "pages.json": "jsonc"
   },
-  "cSpell.words": ["uniapp", "easycom"]
+  "cSpell.words": ["uniapp", "easycom", "autoscan"],
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }
