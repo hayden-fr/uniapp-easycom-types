@@ -35,5 +35,10 @@
       "trailingCommas": "all",
       "semicolons": "asNeeded"
     }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
+    }
   }
 }
