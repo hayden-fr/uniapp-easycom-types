@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, stat, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { expect, test } from 'vitest'
 import { createContext } from '../src/core/ctx'
@@ -32,7 +32,7 @@ test('dts', async () => {
     }"
   `)
 
-  await unlink(dts)
+  await rm(dts)
 })
 
 test('custom dts', async () => {
@@ -50,7 +50,7 @@ test('custom dts', async () => {
 
   expect((await stat(dts)).isFile()).toBe(true)
 
-  await unlink(dts)
+  await rm(dirname(dts), { recursive: true })
 })
 
 test('custom easycom', async () => {
@@ -88,7 +88,7 @@ test('custom easycom', async () => {
     }"
   `)
 
-  await unlink(dts)
+  await rm(dts)
 
   // Uninstall node_modules
   await rm(join(cwd, 'node_modules'), { recursive: true })
