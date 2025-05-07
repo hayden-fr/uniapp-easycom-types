@@ -11,9 +11,6 @@ importers:
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
-      vite:
-        specifier: ^5.2.8
-        version: 5.2.8(@types/node@22.14.0)(terser@5.39.0)
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.4
@@ -30,6 +27,9 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
+      vite:
+        specifier: ^5.2.8
+        version: 5.2.8(@types/node@22.14.0)(terser@5.39.0)
       vitest:
         specifier: ^3.1.2
         version: 3.1.2(@types/node@22.14.0)(jsdom@16.7.0)(terser@5.39.0)
