@@ -82,6 +82,7 @@ test('custom easycom', async () => {
     export {}
     declare module 'vue' {
       export interface GlobalComponents {
+        ComComA: (typeof import('./components/com-a/com-a.vue'))['default']
         UniComA: (typeof import('./components/uni-com-a.vue'))['default']
         VueFileList: (typeof import('../node_modules/packageName/path/to/vue-file-list.vue'))['default']
       }
