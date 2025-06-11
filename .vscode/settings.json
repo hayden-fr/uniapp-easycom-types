@@ -2,8 +2,5 @@
   "files.associations": {
     "pages.json": "jsonc"
   },
-  "cSpell.words": ["uniapp", "easycom", "autoscan"],
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  }
+  "cSpell.words": ["uniapp", "easycom", "autoscan"]
 }
