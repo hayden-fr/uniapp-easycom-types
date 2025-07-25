@@ -11,7 +11,7 @@ test('dts', async () => {
   ctx.scanEasyComponents()
   ctx.generateTypeDeclarations()
 
-  const dts = join(cwd, 'src/easycom.d.ts')
+  const dts = join(cwd, 'src/uniapp-easycom.d.ts')
 
   expect((await stat(dts)).isFile()).toBe(true)
 
@@ -37,7 +37,7 @@ test('dts', async () => {
 
 test('custom dts', async () => {
   const cwd = join(__dirname, 'fixtures/base')
-  const customDts = 'src/types/easycom.d.ts'
+  const customDts = 'src/types/uniapp-easycom.d.ts'
   const ctx = createContext({
     dts: customDts,
   })
@@ -67,7 +67,7 @@ test('custom easycom', async () => {
   ctx.scanEasyComponents()
   ctx.generateTypeDeclarations()
 
-  const dts = join(cwd, 'src/easycom.d.ts')
+  const dts = join(cwd, 'src/uniapp-easycom.d.ts')
 
   expect((await stat(dts)).isFile()).toBe(true)
 

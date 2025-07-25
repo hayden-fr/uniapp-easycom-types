@@ -14,26 +14,26 @@ Use the default configuration
 
 ```typescript
 // vite.config.ts
-import { EasyComTypes } from "uniapp-easycom-types";
+import easycomTypes from 'uniapp-easycom-types'
 
 export default defineConfig({
-  plugins: [EasyComTypes()],
-});
+  plugins: [easycomTypes()],
+})
 ```
 
 or customize configuration
 
 ```typescript
 // vite.config.ts
-import { EasyComTypes } from "uniapp-easycom-types";
+import easycomTypes from 'uniapp-easycom-types'
 
 export default defineConfig({
   plugins: [
-    EasyComTypes({
+    easycomTypes({
       // Filepath to generate corresponding .d.ts file.
       // Defaults to './src/uniapp-easycom.d.ts'
-      dts: "./src/uniapp-easycom.d.ts",
+      dts: './src/types/uniapp-easycom.d.ts',
     }),
   ],
-});
+})
 ```

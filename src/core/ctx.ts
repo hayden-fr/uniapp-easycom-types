@@ -66,7 +66,7 @@ export const createContext = (config: CustomConfig) => {
   const init = (root: string) => {
     resolvedConfig = {
       root: root,
-      dts: config.dts || 'src/easycom.d.ts',
+      dts: config.dts || 'src/uniapp-easycom.d.ts',
       easycom: resolveEasycomRules(root),
     }
   }
