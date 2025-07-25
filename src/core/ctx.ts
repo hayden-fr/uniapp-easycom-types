@@ -24,35 +24,32 @@ export const resolveEasycomRules = (root: string) => {
   const customEasycom = pagesJson.easycom?.custom ?? {}
   const easycom: EasycomObject[] = []
 
-  const autoScan = pagesJson.easycom?.autoscan ?? true
+  for (const key in customEasycom) {
+    if (Object.prototype.hasOwnProperty.call(customEasycom, key)) {
+      const pattern = customEasycom[key]
 
-  if (autoScan) {
-    for (const key in customEasycom) {
-      if (Object.prototype.hasOwnProperty.call(customEasycom, key)) {
-        const pattern = customEasycom[key]
-
-        if (pattern.startsWith('@/')) {
-          easycom.push({ name: key, pattern: pattern.replace('@/', 'src/') })
-        } else if (pattern.startsWith('./')) {
-          easycom.push({ name: key, pattern: pattern.replace('./', 'src/') })
-        } else if (pattern.startsWith('../')) {
-          easycom.push({ name: key, pattern: pattern.replace('../', '') })
-        } else {
-          easycom.push({ name: key, pattern: `node_modules/${pattern}` })
-        }
+      if (pattern.startsWith('@/')) {
+        easycom.push({ name: key, pattern: pattern.replace('@/', 'src/') })
+      } else if (pattern.startsWith('./')) {
+        easycom.push({ name: key, pattern: pattern.replace('./', 'src/') })
+      } else if (pattern.startsWith('../')) {
+        easycom.push({ name: key, pattern: pattern.replace('../', '') })
+      } else {
+        easycom.push({ name: key, pattern: `node_modules/${pattern}` })
       }
     }
+  }
 
-    if (easycom.length === 0) {
-      easycom.push({
-        name: '^(.*)$',
-        pattern: 'src/uni_modules/$0/components/$1/$1.vue',
-      })
-      easycom.push({
-        name: '^(.*)$',
-        pattern: 'src/components/$1/$1.vue',
-      })
-    }
+  const autoScan = pagesJson.easycom?.autoscan ?? true
+  if (autoScan) {
+    easycom.push({
+      name: '^(.*)$',
+      pattern: 'src/uni_modules/$0/components/$1/$1.vue',
+    })
+    easycom.push({
+      name: '^(.*)$',
+      pattern: 'src/components/$1/$1.vue',
+    })
   }
 
   return easycom
