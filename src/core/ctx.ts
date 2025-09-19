@@ -137,6 +137,7 @@ export const createContext = (config: CustomConfig) => {
       ...components,
       '  }',
       '}',
+      ''
     ]
 
     const filename = join(resolvedConfig.root, resolvedConfig.dts)
